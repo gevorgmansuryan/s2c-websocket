@@ -2,6 +2,7 @@
     "name": "gevman/s2c-websocket",
     "description": "One way (server2client) simple WebSocket PHP library",
     "type": "project",
+    "license": "MIT",
     "require": {
         "php": ">=5.4"
     },
