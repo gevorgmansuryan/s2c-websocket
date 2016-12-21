@@ -160,7 +160,7 @@ abstract class SocketHandler
 			'message' => $message,
 			'to' => $to
 		]);
-		socket_write($this->serverSocket, $message, strlen($message));
+		socket_write($this->serverSocket, $message, mb_strlen($message));
 	}
 
 	/**
@@ -196,6 +196,9 @@ abstract class SocketHandler
 	 */
 	private function parseParams($params)
 	{
+		if (strpos($params, $this->path) === 0) {
+			$params = substr($params, mb_strlen($this->path));
+		}
 		$all = explode('/', $params);
 		$keys = [];
 		$values = [];
@@ -231,7 +234,7 @@ abstract class SocketHandler
 		$upgrade[] = sprintf('WebSocket-Location: %s://%s%s', $this->ssl ? 'wss' : 'ws', $this->host, $this->path);
 		$upgrade[] = sprintf('Sec-WebSocket-Accept: %s', $secAccept);
 		$upgrade = implode("\r\n", $upgrade)."\r\n\r\n";
-		socket_write($client, $upgrade, strlen($upgrade));
+		socket_write($client, $upgrade, mb_strlen($upgrade));
 	}
 
 	/**
@@ -248,7 +251,7 @@ abstract class SocketHandler
 		$message = json_encode($data['message']);
 		$to = $data['to'];
 		$b1 = 0x80 | (0x1 & 0x0f);
-		$length = strlen($message);
+		$length = mb_strlen($message);
 		if($length <= 125) {
 			$header = pack('CC', $b1, $length);
 		} elseif($length > 125 && $length < 65536) {
@@ -274,7 +277,7 @@ abstract class SocketHandler
 		}
 		$this->events->message($identityParams, $message);
 		foreach ($sockets as $socket) {
-			socket_write($socket, $fullMessage, strlen($fullMessage));
+			socket_write($socket, $fullMessage, mb_strlen($fullMessage));
 		}
 	}
 
